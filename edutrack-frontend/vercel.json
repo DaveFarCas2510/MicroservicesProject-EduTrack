@@ -1,14 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api/:match*",
-      "destination": "https://microservicesproject-edutrack.onrender.com/api/:match*"
-    },
-    {
-      "source": "/uploads/:match*",
-      "destination": "https://microservicesproject-edutrack.onrender.com/uploads/:match*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
