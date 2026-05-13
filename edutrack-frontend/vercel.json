@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "https://edutrack-api-gateway.onrender.com/api/:match*"
+      "destination": "https://microservicesproject-edutrack.onrender.com/api/:match*"
     },
     {
       "source": "/uploads/:match*",
-      "destination": "https://edutrack-api-gateway.onrender.com/uploads/:match*"
+      "destination": "https://microservicesproject-edutrack.onrender.com/uploads/:match*"
     },
     {
       "source": "/(.*)",
