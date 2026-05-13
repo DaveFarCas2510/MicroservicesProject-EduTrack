@@ -7,6 +7,9 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 120000
+        response-timeout: 120s
       routes:
         - id: auth-service
           uri: http://${AUTH_SERVICE_HOST:auth-service}:8081
