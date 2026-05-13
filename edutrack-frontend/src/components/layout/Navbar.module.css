@@ -1,0 +1,328 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow var(--transition-base), background var(--transition-slow);
+  height: var(--navbar-height);
+}
+
+.scrolled {
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-base);
+  backdrop-filter: blur(12px);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .inner {
+    padding: 0 var(--space-3);
+    gap: var(--space-2);
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.logoAccent {
+  color: var(--accent);
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.navLink {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+}
+
+.navLinkActive {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.iconBtn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.userMenu {
+  position: relative;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.avatar:hover {
+  background: var(--accent);
+}
+
+.avatarInitial {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--accent);
+  transition: color var(--transition-fast);
+}
+
+.avatar:hover .avatarInitial {
+  color: var(--text-inverse);
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  animation: fadeInDown 0.2s ease both;
+  overflow: hidden;
+}
+
+.dropdownHeader {
+  padding: var(--space-3) var(--space-4);
+}
+
+.dropdownName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.dropdownEmail {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--border);
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  text-align: left;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.dropdownItem:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.dropdownItemDanger {
+  color: var(--error);
+}
+
+.dropdownItemDanger:hover {
+  background: var(--error-soft);
+  color: var(--error);
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.loginLink {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.loginLink:hover {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+}
+
+.registerBtn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.registerBtn:hover {
+  background: var(--accent-hover);
+  color: var(--text-inverse);
+  transform: translateY(-1px);
+}
+
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-base);
+  padding: var(--space-4);
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease both;
+  border-top: 1px solid var(--border);
+  z-index: 999;
+}
+
+.mobileLink {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mobileLink:hover,
+.mobileLinkActive {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.mobileLinkAccent {
+  background: var(--accent);
+  color: var(--text-inverse);
+  text-align: center;
+}
+
+.mobileLinkAccent:hover {
+  background: var(--accent-hover);
+  color: var(--text-inverse);
+}
+
+.mobileDivider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-2) 0;
+}
+
+.mobileLogout {
+  display: block;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  color: var(--error);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  text-align: left;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.mobileLogout:hover {
+  background: var(--error-soft);
+}
+
+@media (max-width: 768px) {
+  .desktopNav { display: none; }
+  .hamburger { display: flex; }
+  .authLinks { display: none; }
+  .mobileMenu { display: flex; }
+}
+
+@media (max-width: 480px) {
+  .mobileLink, .mobileLogout { font-size: var(--text-base); }
+  .mobileLink { padding: var(--space-2) var(--space-3); }
+}

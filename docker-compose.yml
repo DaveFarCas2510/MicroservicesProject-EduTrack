@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+
+  # ── Bases de datos ─────────────────────────────────────────────
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: edutrack-auth-db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authsecret
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authuser -d authdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  course-db:
+    image: postgres:15-alpine
+    container_name: edutrack-course-db
+    environment:
+      POSTGRES_DB: coursedb
+      POSTGRES_USER: courseuser
+      POSTGRES_PASSWORD: coursesecret
+    volumes:
+      - course-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U courseuser -d coursedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  enrollment-db:
+    image: postgres:15-alpine
+    container_name: edutrack-enrollment-db
+    environment:
+      POSTGRES_DB: enrollmentdb
+      POSTGRES_USER: enrolluser
+      POSTGRES_PASSWORD: enrollsecret
+    volumes:
+      - enrollment-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enrolluser -d enrollmentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Microservicios ─────────────────────────────────────────────
+
+  auth-service:
+    build: ./auth-service
+    container_name: edutrack-auth
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: authuser
+      SPRING_DATASOURCE_PASSWORD: authsecret
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: 86400000
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  course-service:
+    build: ./course-service
+    container_name: edutrack-course
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://course-db:5432/coursedb
+      SPRING_DATASOURCE_USERNAME: courseuser
+      SPRING_DATASOURCE_PASSWORD: coursesecret
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    depends_on:
+      course-db:
+        condition: service_healthy
+
+  enrollment-service:
+    build: ./enrollment-service
+    container_name: edutrack-enrollment
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://enrollment-db:5432/enrollmentdb
+      SPRING_DATASOURCE_USERNAME: enrolluser
+      SPRING_DATASOURCE_PASSWORD: enrollsecret
+    depends_on:
+      enrollment-db:
+        condition: service_healthy
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: edutrack-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - auth-service
+      - course-service
+      - enrollment-service
+
+  frontend:
+    build: ./edutrack-frontend
+    container_name: edutrack-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+
+volumes:
+  auth-db-data:
+  course-db-data:
+  enrollment-db-data:

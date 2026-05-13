@@ -1,0 +1,84 @@
+services:
+  # ── API Gateway ──────────────────────────────────────────────
+  - type: web
+    name: edutrack-api-gateway
+    env: docker
+    dockerfilePath: ./api-gateway/Dockerfile
+    envVars:
+      - key: AUTH_SERVICE_HOST
+        fromService:
+          type: web
+          name: edutrack-auth-service
+          property: host
+      - key: COURSE_SERVICE_HOST
+        fromService:
+          type: web
+          name: edutrack-course-service
+          property: host
+      - key: ENROLLMENT_SERVICE_HOST
+        fromService:
+          type: web
+          name: edutrack-enrollment-service
+          property: host
+      - key: JWT_SECRET
+        generateValue: true
+
+  # ── Auth Service ─────────────────────────────────────────────
+  - type: web
+    name: edutrack-auth-service
+    env: docker
+    dockerfilePath: ./auth-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  # ── Course Service ───────────────────────────────────────────
+  - type: web
+    name: edutrack-course-service
+    env: docker
+    dockerfilePath: ./course-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_REGION
+        sync: false
+
+  # ── Enrollment Service ───────────────────────────────────────
+  - type: web
+    name: edutrack-enrollment-service
+    env: docker
+    dockerfilePath: ./enrollment-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+databases:
+  - name: edutrack-auth-db
+    plan: free
+  - name: edutrack-course-db
+    plan: free
+  - name: edutrack-enrollment-db
+    plan: free
