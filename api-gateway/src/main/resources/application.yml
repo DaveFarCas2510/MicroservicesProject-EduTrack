@@ -10,6 +10,16 @@ spring:
       httpclient:
         connect-timeout: 120000
         response-timeout: 120s
+        follow-redirects: true
+        ssl:
+          use-insecure-trust-manager: true
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
       routes:
         - id: auth-service
           uri: ${AUTH_SERVICE_URI:http://auth-service:8081}
