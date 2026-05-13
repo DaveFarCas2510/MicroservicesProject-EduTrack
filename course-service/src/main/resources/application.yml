@@ -9,6 +9,8 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:dave123}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2
 
   servlet:
     multipart:
