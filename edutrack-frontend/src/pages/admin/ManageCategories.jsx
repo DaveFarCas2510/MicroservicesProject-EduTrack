@@ -34,8 +34,6 @@ const ManageCategories = () => {
   }, [toast])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true)
     getCategories({ page: 0, size: 12 }).then((data) => {
       setCategories(data.content || [])
       setTotalPages(data.totalPages || 0)

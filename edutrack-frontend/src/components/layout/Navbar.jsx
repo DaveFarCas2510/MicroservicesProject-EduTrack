@@ -3,6 +3,7 @@
 
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
@@ -61,6 +62,15 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   const handleNavClick = () => {
     setMenuOpen(false)
     setUserMenuOpen(false)
@@ -68,8 +78,9 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout()
-    navigate('/')
+    setMenuOpen(false)
     setUserMenuOpen(false)
+    navigate('/')
   }
 
   const navLinks = [
@@ -83,157 +94,178 @@ const Navbar = () => {
   ]
 
   return (
-    <header className={[styles.navbar, scrolled ? styles.scrolled : ''].join(' ')}>
-      <div className={styles.inner}>
-        <Logo />
+    <>
+      <header className={[styles.navbar, scrolled ? styles.scrolled : ''].join(' ')}>
+        <div className={styles.inner}>
+          <Logo />
 
-        {}
-        <nav className={styles.desktopNav} aria-label="Navegación principal">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                [styles.navLink, isActive ? styles.navLinkActive : ''].join(' ')
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {}
-        <div className={styles.actions}>
-          {}
-          <button
-            className={styles.iconBtn}
-            onClick={toggleTheme}
-            aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-          >
-            {isDark ? <SunIcon /> : <MoonIcon />}
-          </button>
-
-          {isAuthenticated ? (
-            <div className={styles.userMenu}>
-              <button
-                className={styles.avatar}
-                onClick={() => setUserMenuOpen((v) => !v)}
-                aria-expanded={userMenuOpen}
-                aria-label="Menú de usuario"
+          <nav className={styles.desktopNav} aria-label="Navegación principal">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  [styles.navLink, isActive ? styles.navLinkActive : ''].join(' ')
+                }
               >
-                <span className={styles.avatarInitial}>
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
-              </button>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
 
-              {userMenuOpen && (
-                <>
-                  <div
-                    className={styles.menuBackdrop}
-                    onClick={() => setUserMenuOpen(false)}
-                  />
-                  <div className={styles.dropdown}>
-                    <div className={styles.dropdownHeader}>
-                      <p className={styles.dropdownName}>{user?.name}</p>
-                      <p className={styles.dropdownEmail}>{user?.email}</p>
-                    </div>
-                    <div className={styles.dropdownDivider} />
-                    {!isAdmin && (
-                      <Link
-                        to="/dashboard"
-                        className={styles.dropdownItem}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        Mi aprendizaje
-                      </Link>
-                    )}
-                    {isAdmin && (
-                      <Link
-                        to="/admin"
-                        className={styles.dropdownItem}
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        Panel admin
-                      </Link>
-                    )}
-                    <div className={styles.dropdownDivider} />
-                    <button
-                      className={[styles.dropdownItem, styles.dropdownItemDanger].join(' ')}
-                      onClick={handleLogout}
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className={styles.authLinks}>
-              <Link to="/login" className={styles.loginLink}>
-                Ingresar
-              </Link>
-              <Link to="/register" className={styles.registerBtn}>
-                Registrarse
-              </Link>
-            </div>
-          )}
-
-          {!isAuthenticated && (
-            <div className={styles.mobileAuth}>
-              <Link to="/login" className={styles.mobileLoginBtn}>
-                Ingresar
-              </Link>
-              <Link to="/register" className={styles.mobileRegisterBtn}>
-                Registrarse
-              </Link>
-            </div>
-          )}
-
-          {}
-          <button
-            className={styles.hamburger}
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Abrir menú"
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
-        </div>
-      </div>
-
-      {}
-      {menuOpen && (
-        <nav className={styles.mobileMenu} aria-label="Navegación móvil">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                [styles.mobileLink, isActive ? styles.mobileLinkActive : ''].join(' ')
-              }
-              onClick={handleNavClick}
+          <div className={styles.actions}>
+            <button
+              className={styles.iconBtn}
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
-              {link.label}
-            </NavLink>
-          ))}
-          <div className={styles.mobileDivider} />
-          {isAuthenticated ? (
-            <button className={styles.mobileLogout} onClick={handleLogout}>
-              Cerrar sesión
+              {isDark ? <SunIcon /> : <MoonIcon />}
             </button>
-          ) : (
-            <>
-              <Link to="/login" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                Ingresar
-              </Link>
-              <Link to="/register" className={[styles.mobileLink, styles.mobileLinkAccent].join(' ')} onClick={() => setMenuOpen(false)}>
-                Registrarse
-              </Link>
-            </>
-          )}
-        </nav>
+
+            {isAuthenticated ? (
+              <div className={styles.userMenu}>
+                <button
+                  className={styles.avatar}
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  aria-expanded={userMenuOpen}
+                  aria-label="Menú de usuario"
+                >
+                  <span className={styles.avatarInitial}>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </span>
+                </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className={styles.menuBackdrop}
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className={styles.dropdown}>
+                      <div className={styles.dropdownHeader}>
+                        <p className={styles.dropdownName}>{user?.name}</p>
+                        <p className={styles.dropdownEmail}>{user?.email}</p>
+                      </div>
+                      <div className={styles.dropdownDivider} />
+                      {!isAdmin && (
+                        <Link
+                          to="/dashboard"
+                          className={styles.dropdownItem}
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          Mi aprendizaje
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          className={styles.dropdownItem}
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          Panel admin
+                        </Link>
+                      )}
+                      <div className={styles.dropdownDivider} />
+                      <button
+                        className={[styles.dropdownItem, styles.dropdownItemDanger].join(' ')}
+                        onClick={handleLogout}
+                      >
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className={styles.authLinks}>
+                <Link to="/login" className={styles.loginLink}>
+                  Ingresar
+                </Link>
+                <Link to="/register" className={styles.registerBtn}>
+                  Registrarse
+                </Link>
+              </div>
+            )}
+
+            {!isAuthenticated && (
+              <div className={styles.mobileAuth}>
+                <Link to="/login" className={styles.mobileLoginBtn}>
+                  Ingresar
+                </Link>
+                <Link to="/register" className={styles.mobileRegisterBtn}>
+                  Registrarse
+                </Link>
+              </div>
+            )}
+
+            <button
+              className={styles.hamburger}
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Abrir menú"
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {menuOpen && createPortal(
+        <div className={styles.mobileOverlay}>
+          <div className={styles.mobileBackdrop} onClick={() => setMenuOpen(false)} />
+          <nav className={styles.mobileMenu} aria-label="Navegación móvil">
+            {isAuthenticated && (
+              <div className={styles.mobileUser}>
+                <span className={styles.mobileUserAvatar}>
+                  {user?.name?.charAt(0)?.toUpperCase() || '?'}
+                </span>
+                <div className={styles.mobileUserInfo}>
+                  <p className={styles.mobileUserName}>{user?.name}</p>
+                  <p className={styles.mobileUserEmail}>{user?.email}</p>
+                </div>
+              </div>
+            )}
+
+            <div className={styles.mobileLinks}>
+              {navLinks.map((link, i) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={i === 0}
+                  className={({ isActive }) =>
+                    [styles.mobileLink, isActive ? styles.mobileLinkActive : ''].join(' ')
+                  }
+                  onClick={handleNavClick}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <div className={styles.mobileDivider} />
+
+            {isAuthenticated ? (
+              <button className={styles.mobileLogout} onClick={handleLogout}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+                Cerrar sesión
+              </button>
+            ) : (
+              <div className={styles.mobileAuthActions}>
+                <Link to="/login" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                  Ingresar
+                </Link>
+                <Link to="/register" className={styles.mobileLinkRegister} onClick={() => setMenuOpen(false)}>
+                  Crear cuenta
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>,
+        document.body
       )}
-    </header>
+    </>
   )
 }
 

@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button'
 import styles from './Auth.module.css'
 
 const LoginPage = () => {
-  const { login, isAuthenticated, error } = useAuth()
+  const { login, isAuthenticated, error, clearError } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || '/cursos'
@@ -17,6 +17,10 @@ const LoginPage = () => {
   useEffect(() => {
     if (isAuthenticated) navigate(from, { replace: true })
   }, [isAuthenticated, from, navigate])
+
+  useEffect(() => {
+    return () => clearError()
+  }, [clearError])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))

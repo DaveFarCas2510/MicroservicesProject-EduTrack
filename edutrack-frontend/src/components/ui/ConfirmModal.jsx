@@ -12,7 +12,7 @@ const ConfirmModal = ({ open, onClose, onConfirm, title, message, confirmText = 
           Cancelar
         </Button>
         <Button
-          variant={variant === 'danger' ? 'primary' : variant}
+          variant={variant}
           onClick={onConfirm}
           loading={loading}
         >

@@ -5,11 +5,15 @@ const PageTransition = ({ children }) => {
   const location = useLocation()
   const [display, setDisplay] = useState(children)
   const [phase, setPhase] = useState('enter')
-  const prevPath = useRef(location.pathname)
+  const prevPath = useRef(location.pathname + location.search)
 
   useEffect(() => {
-    if (location.pathname === prevPath.current) return
-    prevPath.current = location.pathname
+    const path = location.pathname + location.search
+    if (path === prevPath.current) {
+      setDisplay(children)
+      return
+    }
+    prevPath.current = path
 
     setPhase('exit')
     const timer = setTimeout(() => {
@@ -18,10 +22,7 @@ const PageTransition = ({ children }) => {
     }, 150)
 
     return () => clearTimeout(timer)
-  }, [location.pathname, children])
-
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setDisplay(children); setPhase('enter') }, [children])
+  }, [location.pathname, location.search, children])
 
   const style = {
     transition: 'opacity 0.15s ease, transform 0.15s ease',

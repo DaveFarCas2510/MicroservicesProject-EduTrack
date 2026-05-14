@@ -150,7 +150,7 @@ const LessonPage = () => {
                 Lección {lesson.orderIndex || currentIndex + 1} de {lessons.length}
               </span>
               <span className={styles.mobileProgressPct}>
-                {Math.round((progress.completedLessons / progress.totalLessons) * 100)}%
+                {Math.round((progress.completedLessons / (progress.totalLessons || 1)) * 100)}%
               </span>
             </div>
             <ProgressBar

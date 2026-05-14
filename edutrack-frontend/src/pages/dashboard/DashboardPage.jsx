@@ -94,12 +94,12 @@ const DashboardPage = () => {
         <div className={styles.statsBanner}>
           <div className={styles.statsBannerItem}>
             <span className={styles.statsBannerValue}>{progressCounts.completed}</span>
-            <span className={styles.statsBannerLabel}>Lecciones completadas</span>
+            <span className={styles.statsBannerLabel}>Lecciones<br className={styles.labelBreak} />completadas</span>
           </div>
           <div className={styles.statsBannerDivider} />
           <div className={styles.statsBannerItem}>
             <span className={styles.statsBannerValue}>{progressCounts.total}</span>
-            <span className={styles.statsBannerLabel}>Lecciones totales</span>
+            <span className={styles.statsBannerLabel}>Lecciones<br className={styles.labelBreak} />totales</span>
           </div>
           <div className={styles.statsBannerDivider} />
           <div className={styles.statsBannerItem}>
@@ -108,7 +108,7 @@ const DashboardPage = () => {
                 ? Math.round((progressCounts.completed / progressCounts.total) * 100)
                 : 0}%
             </span>
-            <span className={styles.statsBannerLabel}>Progreso global</span>
+            <span className={styles.statsBannerLabel}>Progreso<br className={styles.labelBreak} />global</span>
           </div>
         </div>
       )}
@@ -139,8 +139,9 @@ const DashboardPage = () => {
                 className={styles.courseCard}
                 style={{ animationDelay: `${idx * 80}ms` }}
                 onClick={() => {
-                  if (lessonCount > 0) {
-                    navigate(`/dashboard/curso/${course.id}/leccion/${course.lessons[0].id}`)
+                  const firstLesson = course.lessons?.[0]
+                  if (firstLesson?.id) {
+                    navigate(`/dashboard/curso/${course.id}/leccion/${firstLesson.id}`)
                   }
                 }}
               >

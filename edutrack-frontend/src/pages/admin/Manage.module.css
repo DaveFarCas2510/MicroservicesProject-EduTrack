@@ -28,12 +28,22 @@
 .title {
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: 900;
+  font-weight: 800;
   margin: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.title::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 3px;
   background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  border-radius: var(--radius-full);
 }
 
 .subtitle {

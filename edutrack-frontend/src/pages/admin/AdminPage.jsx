@@ -89,7 +89,7 @@ const AdminPage = () => {
     const fetchStats = async () => {
       try {
         const [coursesData, usersData, categoriesData] = await Promise.all([
-          getCourses({ size: 100 }),
+          getCourses({ size: 10000 }),
           getUsers().catch(() => []),
           getCategories().catch(() => []),
         ])

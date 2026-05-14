@@ -62,7 +62,8 @@ const ManageLessons = () => {
       await addLesson(selectedCourseId, { title: title.trim(), content, orderIndex: nextIndex })
       toast.success('Lección creada')
       setModalOpen(false)
-      fetchLessons(selectedCourseId)
+      const updatedLessons = await fetchLessons(selectedCourseId)
+      setLessons(updatedLessons)
     } catch (err) {
       toast.error(err.message || 'Error al crear lección')
     } finally {
