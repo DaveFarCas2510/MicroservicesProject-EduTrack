@@ -3,8 +3,9 @@
 
 
 
-import { createContext, useContext, useCallback, useReducer } from 'react'
+import { useCallback, useReducer } from 'react'
 import { createPortal } from 'react-dom'
+import { ToastContext } from '@/context/ToastContext'
 import styles from './Toast.module.css'
 
 
@@ -48,8 +49,6 @@ const toastReducer = (state, action) => {
   }
 }
 
-
-const ToastContext = createContext(null)
 
 export const ToastProvider = ({ children }) => {
   const [toasts, dispatch] = useReducer(toastReducer, [])
@@ -95,10 +94,4 @@ export const ToastProvider = ({ children }) => {
       )}
     </ToastContext.Provider>
   )
-}
-
-export const useToast = () => {
-  const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToast must be used within ToastProvider')
-  return ctx
 }

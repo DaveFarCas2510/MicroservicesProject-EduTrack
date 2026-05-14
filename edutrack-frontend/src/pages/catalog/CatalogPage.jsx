@@ -46,8 +46,24 @@ const CatalogPage = () => {
   }, [])
 
   useEffect(() => {
-    fetchCourses(selectedCategory, 0)
-  }, [selectedCategory, fetchCourses])
+  if (loadingRef.current) return
+  loadingRef.current = true
+  setLoading(true)
+  setError(null)
+  const params = { page: 0, size: 9 }
+  if (selectedCategory) params.categoryId = selectedCategory
+  getCourses(params).then((data) => {
+    setCourses(data.content || [])
+    setTotalPages(data.totalPages || 0)
+    setTotalElements(data.totalElements || 0)
+    setPage(data.number || 0)
+  }).catch((err) => {
+    setError(err.message || 'Error al cargar cursos')
+  }).finally(() => {
+    setLoading(false)
+    loadingRef.current = false
+  })
+}, [selectedCategory])
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId === selectedCategory ? null : categoryId)

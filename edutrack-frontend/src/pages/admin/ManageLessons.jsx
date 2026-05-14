@@ -4,7 +4,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/hooks/useToast'
 import styles from './Manage.module.css'
 
 const ManageLessons = () => {
@@ -27,18 +27,20 @@ const ManageLessons = () => {
   }, [toast])
 
   const fetchLessons = useCallback(async (courseId) => {
-    if (!courseId) { setLessons([]); return }
-    setLoadingLessons(true)
-    try {
-      setLessons(await getCourseLessons(courseId))
-    } catch (err) {
-      toast.error(err.message || 'Error al cargar lecciones')
-    } finally {
-      setLoadingLessons(false)
-    }
-  }, [toast])
+    if (!courseId) { return [] }
+    return getCourseLessons(courseId)
+  }, [])
 
-  useEffect(() => { fetchLessons(selectedCourseId) }, [selectedCourseId, fetchLessons])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!selectedCourseId) { setLessons([]); return }
+    setLoadingLessons(true)
+    fetchLessons(selectedCourseId).then((data) => {
+      setLessons(data)
+    }).catch((err) => {
+      toast.error(err.message || 'Error al cargar lecciones')
+    }).finally(() => setLoadingLessons(false))
+  }, [selectedCourseId, fetchLessons, toast])
 
   const handleCourseChange = (e) => {
     setSelectedCourseId(e.target.value)
@@ -74,6 +76,7 @@ const ManageLessons = () => {
     <div className={styles.layout}>
       <Sidebar />
       <div className={styles.content}>
+        <div className={styles.contentInner}>
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Lecciones</h1>
@@ -141,6 +144,7 @@ const ManageLessons = () => {
             </div>
           </div>
         )}
+        </div>
       </div>
 
       <Modal

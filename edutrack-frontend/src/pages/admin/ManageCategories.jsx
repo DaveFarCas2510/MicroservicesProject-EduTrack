@@ -5,12 +5,15 @@ import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import Modal from '@/components/ui/Modal'
 import ConfirmModal from '@/components/ui/ConfirmModal'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/hooks/useToast'
 import styles from './Manage.module.css'
 
 const ManageCategories = () => {
   const toast = useToast()
   const [categories, setCategories] = useState([])
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
+  const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [categoryName, setCategoryName] = useState('')
@@ -18,19 +21,30 @@ const ManageCategories = () => {
   const [deletingId, setDeletingId] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
-  const fetchCategories = useCallback(async () => {
-    setLoading(true)
+  const fetchCategories = useCallback(async (pageNum = 0) => {
     try {
-      const data = await getCategories()
+      const data = await getCategories({ page: pageNum, size: 12 })
       setCategories(data.content || [])
+      setTotalPages(data.totalPages || 0)
+      setTotalElements(data.totalElements || 0)
+      setPage(data.number || 0)
     } catch (err) {
       toast.error(err.message || 'Error al cargar categorías')
-    } finally {
-      setLoading(false)
     }
   }, [toast])
 
-  useEffect(() => { fetchCategories() }, [fetchCategories])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true)
+    getCategories({ page: 0, size: 12 }).then((data) => {
+      setCategories(data.content || [])
+      setTotalPages(data.totalPages || 0)
+      setTotalElements(data.totalElements || 0)
+      setPage(data.number || 0)
+    }).catch((err) => {
+      toast.error(err.message || 'Error al cargar categorías')
+    }).finally(() => setLoading(false))
+  }, [toast])
 
   const handleCreate = async () => {
     if (!categoryName.trim()) return
@@ -40,7 +54,7 @@ const ManageCategories = () => {
       toast.success('Categoría creada')
       setModalOpen(false)
       setCategoryName('')
-      fetchCategories()
+      fetchCategories(0)
     } catch (err) {
       toast.error(err.message || 'Error al crear categoría')
     } finally {
@@ -54,7 +68,7 @@ const ManageCategories = () => {
     try {
       await deleteCategory(id)
       toast.success('Categoría eliminada')
-      fetchCategories()
+      fetchCategories(page)
     } catch (err) {
       toast.error(err.message || 'Error al eliminar categoría')
     } finally {
@@ -66,10 +80,11 @@ const ManageCategories = () => {
     <div className={styles.layout}>
       <Sidebar />
       <div className={styles.content}>
+        <div className={styles.contentInner}>
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Categorías</h1>
-            <p className={styles.subtitle}>{categories.length} categoría{categories.length !== 1 ? 's' : ''}</p>
+            <p className={styles.subtitle}>{totalElements} categoría{totalElements !== 1 ? 's' : ''} en total</p>
           </div>
           <Button onClick={() => setModalOpen(true)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -84,7 +99,8 @@ const ManageCategories = () => {
         ) : categories.length === 0 ? (
           <div className={styles.empty}><p>No hay categorías aún.</p></div>
         ) : (
-          <div className={styles.categoriesGrid}>
+          <>
+            <div className={styles.categoriesGrid}>
               {categories.map((cat) => (
                 <div key={cat.id} className={styles.categoryCard}>
                   <div className={styles.categoryColor}>
@@ -110,8 +126,37 @@ const ManageCategories = () => {
                   </button>
                 </div>
               ))}
-           </div>
+            </div>
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  className={styles.pageBtn}
+                  disabled={page === 0}
+                  onClick={() => fetchCategories(page - 1)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                  Anterior
+                </button>
+                <span className={styles.pageInfo}>
+                  Página {page + 1} de {totalPages}
+                </span>
+                <button
+                  className={styles.pageBtn}
+                  disabled={page >= totalPages - 1}
+                  onClick={() => fetchCategories(page + 1)}
+                >
+                  Siguiente
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
         )}
+        </div>
       </div>
 
       <ConfirmModal

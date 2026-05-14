@@ -3,9 +3,9 @@
 
 
 import { useState, useEffect } from 'react'
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
-import { useTheme } from '@/context/ThemeContext'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './Navbar.module.css'
 
 const SunIcon = () => (
@@ -61,12 +61,10 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  const location = useLocation()
-
-  useEffect(() => {
+  const handleNavClick = () => {
     setMenuOpen(false)
     setUserMenuOpen(false)
-  }, [location.pathname])
+  }
 
   const handleLogout = () => {
     logout()
@@ -213,7 +211,7 @@ const Navbar = () => {
               className={({ isActive }) =>
                 [styles.mobileLink, isActive ? styles.mobileLinkActive : ''].join(' ')
               }
-              onClick={() => setMenuOpen(false)}
+              onClick={handleNavClick}
             >
               {link.label}
             </NavLink>

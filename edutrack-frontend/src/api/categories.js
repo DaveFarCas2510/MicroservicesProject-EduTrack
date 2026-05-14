@@ -5,8 +5,8 @@
 import client from './client'
 
 
-export const getCategories = async () => {
-  const res = await client.get('/api/categories')
+export const getCategories = async (params = {}) => {
+  const res = await client.get('/api/categories', { params })
   return res.data
 }
 

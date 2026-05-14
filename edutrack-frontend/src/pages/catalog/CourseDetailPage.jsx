@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getCourseById } from '@/api/courses'
 import { enrollCourse, getMyEnrollments, getCourseProgress } from '@/api/enrollments'
-import { useAuth } from '@/context/AuthContext'
-import { useToast } from '@/components/ui/Toast'
+import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/hooks/useToast'
 import LessonList from '@/components/course/LessonList'
 import ProgressBar from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
@@ -63,9 +63,13 @@ const CourseDetailPage = () => {
           try {
             const prog = await getCourseProgress(id)
             setProgress(prog)
-          } catch {  }
+          } catch (err) {
+            console.warn('Error fetching course progress:', err)
+          }
         }
-      } catch {  }
+      } catch (err) {
+        console.warn('Error checking enrollment:', err)
+      }
     }
     checkEnrollment()
   }, [id, isAuthenticated, isAdmin])
@@ -84,7 +88,9 @@ const CourseDetailPage = () => {
       try {
         const prog = await getCourseProgress(id)
         setProgress(prog)
-      } catch {  }
+      } catch (err) {
+        console.warn('Error getting course progress:', err)
+      }
     } catch (err) {
       if (err.status === 400) {
         setIsEnrolled(true)

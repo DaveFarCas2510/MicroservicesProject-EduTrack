@@ -1,8 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from '@/hooks/useAuth'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import ProtectedRoute from '@/router/ProtectedRoute'
+import PageTransition from '@/components/layout/PageTransition'
 import Spinner from '@/components/ui/Spinner'
 
 import HomePage from '@/pages/HomePage'
@@ -17,6 +18,7 @@ import ManageCourses from '@/pages/admin/ManageCourses'
 import ManageCategories from '@/pages/admin/ManageCategories'
 import ManageLessons from '@/pages/admin/ManageLessons'
 import ManageUsers from '@/pages/admin/ManageUsers'
+import NotFoundPage from '@/pages/NotFoundPage'
 
 const PageLoader = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -27,7 +29,9 @@ const PageLoader = () => (
 const Layout = ({ children }) => (
   <>
     <Navbar />
-    <main className="page-main">{children}</main>
+    <main className="page-main">
+      <PageTransition>{children}</PageTransition>
+    </main>
     <Footer />
   </>
 )
@@ -84,11 +88,7 @@ const AppRouter = () => {
 
       <Route path="*" element={
         <Layout>
-          <div className="container" style={{ textAlign: 'center', paddingTop: '6rem' }}>
-            <h1>404</h1>
-            <p>Página no encontrada</p>
-            <a href="/" style={{ color: 'var(--accent)', marginTop: '1rem', display: 'inline-block' }}>Volver al inicio</a>
-          </div>
+          <NotFoundPage />
         </Layout>
       } />
     </Routes>

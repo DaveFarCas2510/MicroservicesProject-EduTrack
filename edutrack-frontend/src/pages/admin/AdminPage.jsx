@@ -1,14 +1,85 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getCourses } from '@/api/courses'
+import { getCourses, getCourseById } from '@/api/courses'
 import { getUsers } from '@/api/auth'
 import { getCategories } from '@/api/categories'
 import Sidebar from '@/components/layout/Sidebar'
-import Spinner from '@/components/ui/Spinner'
 import styles from './AdminPage.module.css'
 
-const AdminPage = () => {
+const useAnimatedNumber = (target, duration = 1200) => {
+  const [current, setCurrent] = useState(0)
+  const prevTarget = useRef(0)
+  const frame = useRef(null)
+  const currentRef = useRef(0)
+
+  useEffect(() => {
+    currentRef.current = current
+  }, [current])
+
+  useEffect(() => {
+    if (target === currentRef.current) return
+    const start = currentRef.current
+    const startTime = performance.now()
+
+    const animate = (now) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCurrent(Math.round(start + (target - start) * eased))
+      if (progress < 1) frame.current = requestAnimationFrame(animate)
+    }
+
+    frame.current = requestAnimationFrame(animate)
+    prevTarget.current = target
+    return () => cancelAnimationFrame(frame.current)
+  }, [target, duration])
+
+  return current
+}
+
+const StatCard = ({ label, value, icon, path, gradient, index }) => {
   const navigate = useNavigate()
+  const animatedValue = useAnimatedNumber(value)
+
+  return (
+    <div
+      className={styles.statCard}
+      onClick={() => navigate(path)}
+      style={{
+        '--card-accent': gradient,
+        animationDelay: `${index * 100}ms`,
+      }}
+    >
+      <div className={styles.statGlow} style={{ background: gradient }} />
+      <div className={styles.statIconWrap}>
+        <span className={styles.statIcon}>{icon}</span>
+      </div>
+      <div className={styles.statInfo}>
+        <span className={styles.statValue}>{animatedValue}</span>
+        <span className={styles.statLabel}>{label}</span>
+      </div>
+      <svg className={styles.statArrow} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </div>
+  )
+}
+
+const SkeletonStats = () => (
+  <div className={styles.statsGrid}>
+    {[1, 2, 3, 4].map((i) => (
+      <div key={i} className={styles.statCardSkeleton}>
+        <div className="skeleton-pulse skeleton-avatar" style={{ width: 52, height: 52, borderRadius: 'var(--radius-lg)' }} />
+        <div style={{ flex: 1 }}>
+          <div className="skeleton-pulse skeleton-title" style={{ width: '60%', height: 28, marginBottom: 8 }} />
+          <div className="skeleton-pulse skeleton-text-sm" style={{ width: '40%' }} />
+        </div>
+      </div>
+    ))}
+  </div>
+)
+
+const AdminPage = () => {
   const [stats, setStats] = useState(null)
   const [recentUsers, setRecentUsers] = useState([])
   const [recentCourses, setRecentCourses] = useState([])
@@ -24,19 +95,27 @@ const AdminPage = () => {
         ])
 
         const courses = coursesData.content || []
-        const totalLessons = courses.reduce((sum, c) => sum + (c.lessons?.length || 0), 0)
+        const categories = categoriesData?.content || []
+
+        const courseDetails = await Promise.all(
+          courses.map(c => getCourseById(c.id).catch(() => null))
+        )
+        const totalLessons = courseDetails.reduce(
+          (sum, d) => sum + (d?.lessons?.length || 0), 0
+        )
 
         setStats({
           totalCourses: coursesData.totalElements || courses.length,
           totalUsers: Array.isArray(usersData) ? usersData.length : 0,
           totalLessons,
-          totalCategories: Array.isArray(categoriesData) ? categoriesData.length : 0,
+          totalCategories: categoriesData?.totalElements || categories.length,
         })
 
         if (Array.isArray(usersData)) {
           setRecentUsers(usersData.slice(-5).reverse())
         }
-        setRecentCourses(courses.slice(-5).reverse())
+        const validDetails = courseDetails.filter(Boolean)
+        setRecentCourses(validDetails.slice(-5).reverse())
       } catch {
         setStats({ totalCourses: 0, totalUsers: 0, totalLessons: 0, totalCategories: 0 })
       } finally {
@@ -48,8 +127,15 @@ const AdminPage = () => {
 
   if (loading) {
     return (
-      <div className={styles.loading}>
-        <Spinner size={36} />
+      <div className={styles.layout}>
+        <Sidebar />
+        <div className={styles.content}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Panel de administración</h1>
+            <p className={styles.subtitle}>Cargando estadísticas...</p>
+          </div>
+          <SkeletonStats />
+        </div>
       </div>
     )
   }
@@ -79,7 +165,7 @@ const AdminPage = () => {
         </svg>
       ),
       path: '/admin/usuarios',
-      gradient: '#059669',
+      gradient: '#10B981',
     },
     {
       label: 'Lecciones',
@@ -90,7 +176,7 @@ const AdminPage = () => {
         </svg>
       ),
       path: '/admin/lecciones',
-      gradient: '#D97706',
+      gradient: '#F59E0B',
     },
     {
       label: 'Categorías',
@@ -101,7 +187,7 @@ const AdminPage = () => {
         </svg>
       ),
       path: '/admin/categorias',
-      gradient: '#2563EB',
+      gradient: '#3B82F6',
     },
   ]
 
@@ -114,27 +200,20 @@ const AdminPage = () => {
             <h1 className={styles.title}>Panel de administración</h1>
             <p className={styles.subtitle}>Gestiona tu plataforma EduTrack</p>
           </div>
+          <div className={styles.headerActions}>
+            <div className={styles.lastUpdate}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </div>
         </div>
 
         <div className={styles.statsGrid}>
           {quickActions.map((item, i) => (
-            <div
-              key={item.label}
-              className={styles.statCard}
-              onClick={() => navigate(item.path)}
-              style={{ '--card-accent': item.gradient, animationDelay: `${i * 80}ms` }}
-            >
-              <div className={styles.statIconWrap}>
-                <span className={styles.statIcon}>{item.icon}</span>
-              </div>
-              <div className={styles.statInfo}>
-                <span className={styles.statValue}>{item.value}</span>
-                <span className={styles.statLabel}>{item.label}</span>
-              </div>
-              <svg className={styles.statArrow} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
+            <StatCard key={item.label} {...item} index={i} />
           ))}
         </div>
 

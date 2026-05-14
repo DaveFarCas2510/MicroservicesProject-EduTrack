@@ -4,16 +4,31 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border);
-  transition: box-shadow var(--transition-base), background var(--transition-slow);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: box-shadow var(--transition-base), background var(--transition-slow), border-color var(--transition-base);
   height: var(--navbar-height);
 }
 
+[data-theme='dark'] .navbar {
+  background: rgba(20, 20, 25, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .scrolled {
-  box-shadow: var(--shadow-sm);
-  background: var(--bg-base);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .scrolled {
+  background: rgba(20, 20, 25, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 .inner {
@@ -41,17 +56,17 @@
   gap: var(--space-2);
   text-decoration: none;
   flex-shrink: 0;
-}
-
-.logoText {
   font-family: var(--font-display);
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.logoAccent {
-  color: var(--accent);
+.logo span {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .desktopNav {
@@ -61,13 +76,13 @@
 }
 
 .navLink {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .navLink:hover {
@@ -76,8 +91,11 @@
 }
 
 .navLinkActive {
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--text-inverse);
+  background: var(--gradient-primary);
+  font-weight: 600;
+  box-shadow: 0 2px 8px var(--accent-glow);
+  pointer-events: none;
 }
 
 .actions {
@@ -92,7 +110,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
@@ -110,27 +128,29 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-full);
-  background: var(--accent-soft);
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast);
+  transition: filter var(--transition-fast), box-shadow var(--transition-fast);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .avatar:hover {
-  background: var(--accent);
+  filter: brightness(1.15);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow);
 }
 
 .avatarInitial {
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--accent);
-  transition: color var(--transition-fast);
-}
-
-.avatar:hover .avatarInitial {
   color: var(--text-inverse);
+  transition: color var(--transition-fast);
+  line-height: 1;
 }
 
 .menuBackdrop {
@@ -144,13 +164,20 @@
   top: calc(100% + 8px);
   right: 0;
   min-width: 220px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
   z-index: 1000;
   animation: fadeInDown 0.2s ease both;
   overflow: hidden;
+}
+
+[data-theme='dark'] .dropdown {
+  background: rgba(20, 20, 25, 0.85);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .dropdownHeader {
@@ -173,6 +200,7 @@
 .dropdownDivider {
   height: 1px;
   background: var(--border);
+  margin: 0;
 }
 
 .dropdownItem {
@@ -212,30 +240,31 @@
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .loginLink:hover {
-  color: var(--text-primary);
+  color: var(--accent);
   background: var(--accent-soft);
 }
 
 .registerBtn {
   padding: var(--space-2) var(--space-4);
-  background: var(--accent);
+  background: var(--gradient-primary);
   color: var(--text-inverse);
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
-  border-radius: var(--radius-md);
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
 .registerBtn:hover {
-  background: var(--accent-hover);
   color: var(--text-inverse);
   transform: translateY(-1px);
+  box-shadow: 0 0 28px var(--accent-glow);
 }
 
 .hamburger {
@@ -255,14 +284,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg-base);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   padding: var(--space-4);
   flex-direction: column;
   gap: var(--space-1);
   overflow-y: auto;
-  animation: fadeIn 0.2s ease both;
+  animation: slideInUp 0.3s ease both;
   border-top: 1px solid var(--border);
   z-index: 999;
+}
+
+[data-theme='dark'] .mobileMenu {
+  background: rgba(20, 20, 25, 0.9);
 }
 
 .mobileLink {
@@ -276,21 +311,28 @@
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.mobileLink:hover,
-.mobileLinkActive {
+.mobileLink:hover {
   background: var(--accent-soft);
   color: var(--accent);
 }
 
+.mobileLinkActive {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  pointer-events: none;
+}
+
 .mobileLinkAccent {
-  background: var(--accent);
+  background: var(--gradient-primary);
   color: var(--text-inverse);
   text-align: center;
+  border-radius: var(--radius-full);
 }
 
 .mobileLinkAccent:hover {
-  background: var(--accent-hover);
   color: var(--text-inverse);
+  opacity: 0.95;
 }
 
 .mobileDivider {
@@ -328,19 +370,25 @@
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   white-space: nowrap;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.mobileLoginBtn:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .mobileRegisterBtn {
   display: none;
   padding: var(--space-1) var(--space-3);
-  background: var(--accent);
+  background: var(--gradient-primary);
   color: var(--text-inverse);
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 

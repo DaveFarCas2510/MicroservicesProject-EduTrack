@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { createCourse, updateCourse, uploadCourseImage } from '@/api/courses'
 import Button from '@/components/ui/Button'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/hooks/useToast'
 
 const formResponsive = `
   @media (max-width: 640px) {

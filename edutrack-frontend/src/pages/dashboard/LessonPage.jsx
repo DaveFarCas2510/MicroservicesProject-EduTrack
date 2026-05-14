@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getCourseById } from '@/api/courses'
 import { getLesson } from '@/api/enrollments'
 import { getCourseProgress, completeLesson } from '@/api/enrollments'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/hooks/useToast'
 import LessonList from '@/components/course/LessonList'
 import ProgressBar from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
@@ -181,7 +181,7 @@ const LessonPage = () => {
         </div>
 
         <div className={styles.lessonContent}>
-          {lesson.content.split('\n').map((paragraph, i) => (
+          {(lesson.content || '').split('\n').map((paragraph, i) => (
             paragraph.trim() ? <p key={i} className={styles.paragraph}>{paragraph}</p> : null
           ))}
         </div>
