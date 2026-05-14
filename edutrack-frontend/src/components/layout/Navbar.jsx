@@ -180,6 +180,17 @@ const Navbar = () => {
             </div>
           )}
 
+          {!isAuthenticated && (
+            <div className={styles.mobileAuth}>
+              <Link to="/login" className={styles.mobileLoginBtn}>
+                Ingresar
+              </Link>
+              <Link to="/register" className={styles.mobileRegisterBtn}>
+                Registrarse
+              </Link>
+            </div>
+          )}
+
           {}
           <button
             className={styles.hamburger}

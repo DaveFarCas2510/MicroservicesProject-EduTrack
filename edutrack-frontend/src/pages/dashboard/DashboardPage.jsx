@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMyEnrollments } from '@/api/enrollments'
+import { getMyEnrollments, getCourseProgress } from '@/api/enrollments'
 import { getCourseById } from '@/api/courses'
 import Spinner from '@/components/ui/Spinner'
+import ProgressBar from '@/components/ui/ProgressBar'
 import styles from './DashboardPage.module.css'
 
 const DashboardPage = () => {
@@ -19,10 +20,13 @@ const DashboardPage = () => {
         const coursesWithDetails = await Promise.all(
           enrollments.map(async (enrollment) => {
             try {
-              const course = await getCourseById(enrollment.courseId)
-              return { ...enrollment, course }
+              const [course, progress] = await Promise.all([
+                getCourseById(enrollment.courseId),
+                getCourseProgress(enrollment.courseId).catch(() => null),
+              ])
+              return { ...enrollment, course, progress }
             } catch {
-              return { ...enrollment, course: null }
+              return { ...enrollment, course: null, progress: null }
             }
           })
         )
@@ -37,6 +41,24 @@ const DashboardPage = () => {
   }, [])
 
   const totalLessons = (course) => course.lessons?.length || 0
+
+  const progressCounts = useMemo(() => {
+    let completed = 0
+    let total = 0
+    enrolledCourses.forEach((enr) => {
+      const p = enr.progress
+      const lessonCount = totalLessons(enr.course)
+      if (p) {
+        const done = p.completedLessons ?? p.completed ?? 0
+        const all = p.totalLessons ?? p.total ?? lessonCount
+        completed += done
+        total += all
+      } else {
+        total += lessonCount
+      }
+    })
+    return { completed, total }
+  }, [enrolledCourses])
 
   if (loading) {
     return (
@@ -68,6 +90,29 @@ const DashboardPage = () => {
         </div>
       </div>
 
+      {enrolledCourses.length > 0 && (
+        <div className={styles.statsBanner}>
+          <div className={styles.statsBannerItem}>
+            <span className={styles.statsBannerValue}>{progressCounts.completed}</span>
+            <span className={styles.statsBannerLabel}>Lecciones completadas</span>
+          </div>
+          <div className={styles.statsBannerDivider} />
+          <div className={styles.statsBannerItem}>
+            <span className={styles.statsBannerValue}>{progressCounts.total}</span>
+            <span className={styles.statsBannerLabel}>Lecciones totales</span>
+          </div>
+          <div className={styles.statsBannerDivider} />
+          <div className={styles.statsBannerItem}>
+            <span className={styles.statsBannerValue}>
+              {progressCounts.total > 0
+                ? Math.round((progressCounts.completed / progressCounts.total) * 100)
+                : 0}%
+            </span>
+            <span className={styles.statsBannerLabel}>Progreso global</span>
+          </div>
+        </div>
+      )}
+
       {enrolledCourses.length === 0 ? (
         <div className={styles.empty}>
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4">
@@ -82,13 +127,17 @@ const DashboardPage = () => {
         </div>
       ) : (
         <div className={styles.grid}>
-          {enrolledCourses.map((enrollment) => {
+          {enrolledCourses.map((enrollment, idx) => {
             const course = enrollment.course
             const lessonCount = totalLessons(course)
+            const progress = enrollment.progress
+            const completed = progress ? (progress.completedLessons ?? progress.completed ?? 0) : 0
+            const total = progress ? (progress.totalLessons ?? progress.total ?? lessonCount) : lessonCount
             return (
               <div
                 key={enrollment.id}
                 className={styles.courseCard}
+                style={{ animationDelay: `${idx * 80}ms` }}
                 onClick={() => {
                   if (lessonCount > 0) {
                     navigate(`/dashboard/curso/${course.id}/leccion/${course.lessons[0].id}`)
@@ -108,6 +157,10 @@ const DashboardPage = () => {
                 <div className={styles.courseBody}>
                   <h3 className={styles.courseTitle}>{course.title}</h3>
                   <p className={styles.courseDesc}>{course.description}</p>
+                  <div className={styles.courseProgressWrap}>
+                    <ProgressBar value={completed} max={total} showLabel={false} />
+                    <span className={styles.courseProgressLabel}>{completed}/{total} lecciones</span>
+                  </div>
                   <div className={styles.courseMeta}>
                     <span className={styles.lessonCount}>{lessonCount} lecciones</span>
                     <span className={styles.enrolledDate}>

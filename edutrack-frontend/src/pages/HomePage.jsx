@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import styles from './HomePage.module.css'
@@ -294,15 +295,35 @@ const CtaSection = () => {
   )
 }
 
-const HomePage = () => (
-  <>
-    <HeroSection />
-    <FeaturesSection />
-    <StatsBar />
-    <StepsSection />
-    <TestimonialsSection />
-    <CtaSection />
-  </>
-)
+const HomePage = () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.revealed)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -48px 0px' }
+    )
+
+    const els = document.querySelectorAll(`[data-reveal]`)
+    els.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <>
+      <HeroSection />
+      <div data-reveal><FeaturesSection /></div>
+      <div data-reveal><StatsBar /></div>
+      <div data-reveal><StepsSection /></div>
+      <div data-reveal><TestimonialsSection /></div>
+      <div data-reveal><CtaSection /></div>
+    </>
+  )
+}
 
 export default HomePage

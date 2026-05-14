@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCourses } from '@/api/courses'
 import { getUsers } from '@/api/auth'
+import { getCategories } from '@/api/categories'
 import Sidebar from '@/components/layout/Sidebar'
 import Spinner from '@/components/ui/Spinner'
 import styles from './AdminPage.module.css'
@@ -9,21 +10,35 @@ import styles from './AdminPage.module.css'
 const AdminPage = () => {
   const navigate = useNavigate()
   const [stats, setStats] = useState(null)
+  const [recentUsers, setRecentUsers] = useState([])
+  const [recentCourses, setRecentCourses] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [coursesData, usersData] = await Promise.all([
-          getCourses({ size: 1 }),
+        const [coursesData, usersData, categoriesData] = await Promise.all([
+          getCourses({ size: 100 }),
           getUsers().catch(() => []),
+          getCategories().catch(() => []),
         ])
+
+        const courses = coursesData.content || []
+        const totalLessons = courses.reduce((sum, c) => sum + (c.lessons?.length || 0), 0)
+
         setStats({
-          totalCourses: coursesData.totalElements || 0,
+          totalCourses: coursesData.totalElements || courses.length,
           totalUsers: Array.isArray(usersData) ? usersData.length : 0,
+          totalLessons,
+          totalCategories: Array.isArray(categoriesData) ? categoriesData.length : 0,
         })
+
+        if (Array.isArray(usersData)) {
+          setRecentUsers(usersData.slice(-5).reverse())
+        }
+        setRecentCourses(courses.slice(-5).reverse())
       } catch {
-        setStats({ totalCourses: 0, totalUsers: 0 })
+        setStats({ totalCourses: 0, totalUsers: 0, totalLessons: 0, totalCategories: 0 })
       } finally {
         setLoading(false)
       }
@@ -68,7 +83,7 @@ const AdminPage = () => {
     },
     {
       label: 'Lecciones',
-      value: 'Ir',
+      value: stats.totalLessons,
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
@@ -79,7 +94,7 @@ const AdminPage = () => {
     },
     {
       label: 'Categorías',
-      value: 'Ir',
+      value: stats.totalCategories,
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M4 4h6l2 2h8v12H4V4z" />
@@ -107,7 +122,7 @@ const AdminPage = () => {
               key={item.label}
               className={styles.statCard}
               onClick={() => navigate(item.path)}
-              style={{ '--card-accent': item.gradient }}
+              style={{ '--card-accent': item.gradient, animationDelay: `${i * 80}ms` }}
             >
               <div className={styles.statIconWrap}>
                 <span className={styles.statIcon}>{item.icon}</span>
@@ -121,6 +136,65 @@ const AdminPage = () => {
               </svg>
             </div>
           ))}
+        </div>
+
+        <div className={styles.recentSection}>
+          <h2 className={styles.recentTitle}>Actividad reciente</h2>
+          <div className={styles.recentGrid}>
+            <div className={styles.recentCard}>
+              <h3 className={styles.recentCardTitle}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                </svg>
+                Últimos usuarios
+              </h3>
+              {recentUsers.length > 0 ? (
+                <ul className={styles.recentList}>
+                  {recentUsers.map((u, i) => (
+                    <li key={i} className={styles.recentItem}>
+                      <div className={styles.recentItemAvatar}>
+                        {u.name?.charAt(0)?.toUpperCase() || u.email?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                      <div className={styles.recentItemInfo}>
+                        <span className={styles.recentItemName}>{u.name || u.email || 'Sin nombre'}</span>
+                        <span className={styles.recentItemMeta}>{u.email || ''}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.recentEmpty}>Sin usuarios registrados</p>
+              )}
+            </div>
+
+            <div className={styles.recentCard}>
+              <h3 className={styles.recentCardTitle}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Últimos cursos
+              </h3>
+              {recentCourses.length > 0 ? (
+                <ul className={styles.recentList}>
+                  {recentCourses.map((c, i) => (
+                    <li key={i} className={styles.recentItem}>
+                      <div className={styles.recentItemAvatar} style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                        {c.title?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                      <div className={styles.recentItemInfo}>
+                        <span className={styles.recentItemName}>{c.title || 'Sin título'}</span>
+                        <span className={styles.recentItemMeta}>{c.lessons?.length || 0} lecciones</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.recentEmpty}>Sin cursos creados</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

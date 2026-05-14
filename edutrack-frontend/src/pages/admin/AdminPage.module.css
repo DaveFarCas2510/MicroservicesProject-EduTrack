@@ -50,6 +50,7 @@
   cursor: pointer;
   transition: all var(--transition-base);
   position: relative;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .statCard:hover {
@@ -111,6 +112,108 @@
   transition: all var(--transition-fast);
 }
 
+.recentSection {
+  margin-top: var(--space-10);
+}
+
+.recentTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-5);
+}
+
+.recentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.recentCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+}
+
+.recentCardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--space-4);
+}
+
+.recentCardTitle svg {
+  color: var(--accent);
+}
+
+.recentList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.recentItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.recentItemAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #34D399);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.recentItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.recentItemName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recentItemMeta {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recentEmpty {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
 @media (max-width: 1200px) {
   .content { padding: var(--space-6) var(--space-4); }
   .statsGrid { gap: var(--space-4); }
@@ -119,6 +222,7 @@
 @media (max-width: 1024px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
   .statCard { min-height: 80px; }
+  .recentGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {

@@ -153,7 +153,45 @@
   margin-bottom: var(--space-4);
 }
 
+.mobileProgress {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.mobileProgressTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobileProgressPct {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--success);
+}
+
+.mobileLessonNav {
+  margin-top: var(--space-1);
+}
+
+.mobileLessonSelect {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main { padding: var(--space-6); }
+  .mobileProgress { display: flex; }
 }

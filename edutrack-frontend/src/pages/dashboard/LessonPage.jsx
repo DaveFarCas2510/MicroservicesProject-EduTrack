@@ -142,10 +142,41 @@ const LessonPage = () => {
       </div>
 
       <div className={styles.main}>
+        {}
+        {progress && (
+          <div className={styles.mobileProgress}>
+            <div className={styles.mobileProgressTop}>
+              <span className={styles.lessonOrder}>
+                Lección {lesson.orderIndex || currentIndex + 1} de {lessons.length}
+              </span>
+              <span className={styles.mobileProgressPct}>
+                {Math.round((progress.completedLessons / progress.totalLessons) * 100)}%
+              </span>
+            </div>
+            <ProgressBar
+              value={progress.completedLessons}
+              max={progress.totalLessons}
+              size="sm"
+              variant="success"
+              showLabel={false}
+            />
+            <div className={styles.mobileLessonNav}>
+              <select
+                className={styles.mobileLessonSelect}
+                value={lessonId}
+                onChange={(e) => handleSelectLesson(e.target.value)}
+              >
+                {lessons.map((l, i) => (
+                  <option key={l.id} value={l.id}>
+                    {i + 1}. {l.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
         <div className={styles.lessonHeader}>
-          <span className={styles.lessonOrder}>
-            Lección {lesson.orderIndex || currentIndex + 1} de {lessons.length}
-          </span>
           <h1 className={styles.lessonTitle}>{lesson.title}</h1>
         </div>
 
