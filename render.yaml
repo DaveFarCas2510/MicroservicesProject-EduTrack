@@ -5,21 +5,6 @@ services:
     env: docker
     dockerfilePath: ./api-gateway/Dockerfile
     envVars:
-      - key: AUTH_SERVICE_HOST
-        fromService:
-          type: web
-          name: edutrack-auth-service
-          property: host
-      - key: COURSE_SERVICE_HOST
-        fromService:
-          type: web
-          name: edutrack-course-service
-          property: host
-      - key: ENROLLMENT_SERVICE_HOST
-        fromService:
-          type: web
-          name: edutrack-enrollment-service
-          property: host
       - key: JWT_SECRET
         sync: false
 
