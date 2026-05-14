@@ -174,7 +174,7 @@ const ManageCategories = () => {
             <label className={styles.label}>Nombre de la categoría</label>
             <input
               className={styles.input}
-              placeholder="Ej: Programación"
+              placeholder="Ej: Desarrollo Web"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}

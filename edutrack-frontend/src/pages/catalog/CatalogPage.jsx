@@ -116,7 +116,7 @@ const CatalogPage = () => {
           <input
             className={styles.searchInput}
             type="text"
-            placeholder="Buscar cursos, categorías..."
+            placeholder="Explora cursos, temas o categorías..."
             value={searchQuery}
             onChange={handleSearchChange}
           />

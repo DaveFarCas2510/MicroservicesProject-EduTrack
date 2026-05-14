@@ -109,7 +109,7 @@ const CourseForm = ({ course, categories, onSave, onCancel }) => {
             name="title"
             value={form.title}
             onChange={handleChange}
-            placeholder="Ej: Java desde cero"
+            placeholder="Ej: Desarrollo Web Avanzado"
             style={{
               padding: 'var(--space-3) var(--space-4)',
               border: '1px solid var(--border)',
@@ -157,7 +157,7 @@ const CourseForm = ({ course, categories, onSave, onCancel }) => {
           name="description"
           value={form.description}
           onChange={handleChange}
-          placeholder="Describe el contenido del curso..."
+          placeholder="Describe los objetivos y temario del curso..."
           rows={3}
           style={{
             padding: 'var(--space-3) var(--space-4)',

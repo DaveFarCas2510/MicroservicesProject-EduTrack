@@ -20,6 +20,9 @@ const PageTransition = ({ children }) => {
     return () => clearTimeout(timer)
   }, [location.pathname, children])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setDisplay(children); setPhase('enter') }, [children])
+
   const style = {
     transition: 'opacity 0.15s ease, transform 0.15s ease',
     opacity: phase === 'enter' ? 1 : 0,

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import Button from '@/components/ui/Button'
@@ -14,10 +14,9 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [localError, setLocalError] = useState(null)
 
-  if (isAuthenticated) {
-    navigate(from, { replace: true })
-    return null
-  }
+  useEffect(() => {
+    if (isAuthenticated) navigate(from, { replace: true })
+  }, [isAuthenticated, from, navigate])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -64,7 +63,7 @@ const LoginPage = () => {
               name="email"
               type="email"
               className={styles.input}
-              placeholder="tu@correo.com"
+              placeholder="usuario@ejemplo.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
@@ -79,7 +78,7 @@ const LoginPage = () => {
               name="password"
               type="password"
               className={styles.input}
-              placeholder="••••••"
+              placeholder="Contraseña"
               value={form.password}
               onChange={handleChange}
               autoComplete="current-password"

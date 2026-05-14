@@ -142,7 +142,7 @@ const ManageCourses = () => {
               </svg>
               <input
                 type="text"
-                placeholder="Buscar cursos..."
+                placeholder="Buscar por título, categoría..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={styles.searchInput}

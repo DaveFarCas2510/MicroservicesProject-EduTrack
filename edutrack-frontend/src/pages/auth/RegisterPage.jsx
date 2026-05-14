@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import Button from '@/components/ui/Button'
@@ -12,10 +12,9 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false)
   const [localError, setLocalError] = useState(null)
 
-  if (isAuthenticated) {
-    navigate('/cursos', { replace: true })
-    return null
-  }
+  useEffect(() => {
+    if (isAuthenticated) navigate('/cursos', { replace: true })
+  }, [isAuthenticated, navigate])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -70,7 +69,7 @@ const RegisterPage = () => {
               name="name"
               type="text"
               className={styles.input}
-              placeholder="David Farfán"
+              placeholder="Nombre completo"
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
@@ -85,7 +84,7 @@ const RegisterPage = () => {
               name="email"
               type="email"
               className={styles.input}
-              placeholder="tu@correo.com"
+              placeholder="correo@ejemplo.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
@@ -100,7 +99,7 @@ const RegisterPage = () => {
               name="password"
               type="password"
               className={styles.input}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Contraseña"
               value={form.password}
               onChange={handleChange}
               autoComplete="new-password"
@@ -115,7 +114,7 @@ const RegisterPage = () => {
               name="confirmPassword"
               type="password"
               className={styles.input}
-              placeholder="Repite tu contraseña"
+              placeholder="Confirmar contraseña"
               value={form.confirmPassword}
               onChange={handleChange}
               autoComplete="new-password"

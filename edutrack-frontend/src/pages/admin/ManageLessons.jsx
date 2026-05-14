@@ -164,7 +164,7 @@ const ManageLessons = () => {
             <label className={styles.label}>Título de la lección</label>
             <input
               className={styles.input}
-              placeholder="Ej: Introducción a Variables"
+              placeholder="Ej: Fundamentos de Programación"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               autoFocus
@@ -175,7 +175,7 @@ const ManageLessons = () => {
             <textarea
               className={styles.input}
               style={{ minHeight: 160, resize: 'vertical' }}
-              placeholder="Escribe el contenido de la lección..."
+              placeholder="Redacta el contenido de la lección..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />

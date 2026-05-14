@@ -63,7 +63,7 @@ const ManageUsers = () => {
               </svg>
               <input
                 type="text"
-                placeholder="Buscar por nombre o email..."
+                placeholder="Filtrar por nombre o correo..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={styles.searchInput}
