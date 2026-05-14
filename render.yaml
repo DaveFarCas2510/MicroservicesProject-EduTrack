@@ -21,7 +21,7 @@ services:
           name: edutrack-enrollment-service
           property: host
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
 
   # ── Auth Service ─────────────────────────────────────────────
   - type: web
@@ -75,10 +75,4 @@ services:
       - key: SPRING_DATASOURCE_PASSWORD
         sync: false
 
-databases:
-  - name: edutrack-auth-db
-    plan: free
-  - name: edutrack-course-db
-    plan: free
-  - name: edutrack-enrollment-db
-    plan: free
+# (Las bases de datos PostgreSQL ya fueron creadas manualmente en Render)

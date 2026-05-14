@@ -33,12 +33,19 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path       = exchange.getRequest().getURI().getPath();
+        String method     = exchange.getRequest().getMethod().name();
         String authHeader = exchange.getRequest()
                 .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
 
-        boolean isPublic = isPublicPath(path);
-        boolean hasToken = authHeader != null && authHeader.startsWith("Bearer ");
+        boolean isPreFlight = "OPTIONS".equalsIgnoreCase(method);
+        boolean isPublic    = isPublicPath(path);
+        boolean hasToken    = authHeader != null && authHeader.startsWith("Bearer ");
+
+        // CORS preflight → dejar pasar sin validar
+        if (isPreFlight) {
+            return chain.filter(exchange);
+        }
 
         // Si no es pública y no tiene token → rechazar
         if (!isPublic && !hasToken) {

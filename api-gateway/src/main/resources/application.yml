@@ -17,27 +17,33 @@ spring:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowed-origin-patterns: "*"
+            allowed-origin-patterns:
+              - "https://microservices-project-edu-track.vercel.app"
+              - "https://*.vercel.app"
+              - "https://*.onrender.com"
+              - "http://localhost:3000"
+              - "http://localhost:5173"
             allowed-methods: "*"
             allowed-headers: "*"
+            allow-credentials: true
       routes:
         - id: auth-service
-          uri: ${AUTH_SERVICE_URI:http://auth-service:8081}
+          uri: "http://${AUTH_SERVICE_HOST:auth-service}:8081"
           predicates:
             - Path=/api/auth/**
 
         - id: course-service
-          uri: ${COURSE_SERVICE_URI:http://course-service:8082}
+          uri: "http://${COURSE_SERVICE_HOST:course-service}:8082"
           predicates:
             - Path=/api/courses/**, /api/lessons/**, /api/categories/**
 
         - id: enrollment-service
-          uri: ${ENROLLMENT_SERVICE_URI:http://enrollment-service:8083}
+          uri: "http://${ENROLLMENT_SERVICE_HOST:enrollment-service}:8083"
           predicates:
             - Path=/api/enrollments/**
 
         - id: course-uploads
-          uri: ${COURSE_SERVICE_URI:http://course-service:8082}
+          uri: "http://${COURSE_SERVICE_HOST:course-service}:8082"
           predicates:
             - Path=/uploads/**
 
