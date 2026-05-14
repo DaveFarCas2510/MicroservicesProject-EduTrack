@@ -7,6 +7,12 @@ services:
     envVars:
       - key: JWT_SECRET
         sync: false
+      - key: AUTH_SERVICE_URL
+        sync: false
+      - key: COURSE_SERVICE_URL
+        sync: false
+      - key: ENROLLMENT_SERVICE_URL
+        sync: false
 
   # ── Auth Service ─────────────────────────────────────────────
   - type: web

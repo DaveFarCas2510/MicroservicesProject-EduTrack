@@ -28,22 +28,22 @@ spring:
             allow-credentials: true
       routes:
         - id: auth-service
-          uri: http://edutrack-auth-service:8081
+          uri: ${AUTH_SERVICE_URL:http://auth-service:8081}
           predicates:
             - Path=/api/auth/**
 
         - id: course-service
-          uri: http://edutrack-course-service:8082
+          uri: ${COURSE_SERVICE_URL:http://course-service:8082}
           predicates:
             - Path=/api/courses/**, /api/lessons/**, /api/categories/**
 
         - id: enrollment-service
-          uri: http://edutrack-enrollment-service:8083
+          uri: ${ENROLLMENT_SERVICE_URL:http://enrollment-service:8083}
           predicates:
             - Path=/api/enrollments/**
 
         - id: course-uploads
-          uri: http://edutrack-course-service:8082
+          uri: ${COURSE_SERVICE_URL:http://course-service:8082}
           predicates:
             - Path=/uploads/**
 
