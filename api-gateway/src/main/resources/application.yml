@@ -10,7 +10,6 @@ spring:
       httpclient:
         connect-timeout: 120000
         response-timeout: 120s
-        follow-redirects: true
         ssl:
           use-insecure-trust-manager: true
       globalcors:
