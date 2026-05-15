@@ -56,7 +56,7 @@ class CourseServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         when(courseRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(testCourse)));
 
-        Page<CourseSummaryResponse> result = courseService.getAllCourses(null, pageable);
+        Page<CourseSummaryResponse> result = courseService.getAllCourses(null, null, pageable);
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("Java Basics");
@@ -68,7 +68,7 @@ class CourseServiceTest {
         when(courseRepository.findByCategoryId(1L, pageable))
                 .thenReturn(new PageImpl<>(List.of(testCourse)));
 
-        Page<CourseSummaryResponse> result = courseService.getAllCourses(1L, pageable);
+        Page<CourseSummaryResponse> result = courseService.getAllCourses(1L, null, pageable);
 
         assertThat(result).hasSize(1);
         verify(courseRepository).findByCategoryId(1L, pageable);

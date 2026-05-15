@@ -24,11 +24,12 @@ public class CourseController {
     private final S3Service s3Service;
 
     @GetMapping
-    @Operation(summary = "Listar cursos paginados, filtro opcional por categoría")
+    @Operation(summary = "Listar cursos paginados, filtros opcionales por categoría y búsqueda")
     public ResponseEntity<Page<CourseSummaryResponse>> getAll(
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(courseService.getAllCourses(categoryId, pageable));
+        return ResponseEntity.ok(courseService.getAllCourses(categoryId, search, pageable));
     }
 
     @GetMapping("/{id}")

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getCourses, getCourseById, deleteCourse } from '@/api/courses'
 import { getCategories } from '@/api/categories'
 import Sidebar from '@/components/layout/Sidebar'
@@ -22,22 +22,14 @@ const ManageCourses = () => {
   const [editingCourse, setEditingCourse] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [totalElements, setTotalElements] = useState(0)
 
-  const filteredCourses = useMemo(() => {
-    if (!search.trim()) return courses
-    const query = search.toLowerCase().trim()
-    return courses.filter(
-      (course) =>
-        course.title.toLowerCase().includes(query) ||
-        course.description.toLowerCase().includes(query) ||
-        (course.category?.name?.toLowerCase().includes(query) ?? false)
-    )
-  }, [courses, search])
-
-  const fetchCourses = useCallback(async (pageNum = 0) => {
+  const fetchCourses = useCallback(async (pageNum = 0, searchQuery = '') => {
     setLoading(true)
     try {
-      const data = await getCourses({ page: pageNum, size: 10 })
+      const params = { page: pageNum, size: 10 }
+      if (searchQuery.trim()) params.search = searchQuery.trim()
+      const data = await getCourses(params)
       const coursesList = data.content || []
 
       const withCounts = await Promise.all(
@@ -53,6 +45,7 @@ const ManageCourses = () => {
 
       setCourses(withCounts)
       setTotalPages(data.totalPages || 0)
+      setTotalElements(data.totalElements || 0)
       setPage(data.number || 0)
     } catch (err) {
       toast.error(err.message || 'Error al cargar cursos')
@@ -62,26 +55,25 @@ const ManageCourses = () => {
   }, [toast])
 
   useEffect(() => {
-  let cancelled = false
-  const loadData = async () => {
-    setLoading(true)
-    try {
-      await fetchCourses()
-      const categoriesData = await getCategories()
-      if (!cancelled) {
-        setCategories(categoriesData.content || [])
-      }
-    } catch (err) {
-      if (!cancelled) {
-        toast.error(err.message || 'Error al cargar datos')
-      }
-    } finally {
-      if (!cancelled) setLoading(false)
+    fetchCourses(0, search)
+  }, [fetchCourses])
+
+  useEffect(() => {
+    if (!search.trim()) {
+      fetchCourses(0, '')
+      return
     }
-  }
-  loadData()
-  return () => { cancelled = true }
-}, [fetchCourses, toast])
+    const timer = setTimeout(() => {
+      fetchCourses(0, search)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [search, fetchCourses])
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => setCategories(data.content || []))
+      .catch(() => {})
+  }, [])
 
   const handleEdit = (course) => {
     setEditingCourse(course)
@@ -99,7 +91,7 @@ const ManageCourses = () => {
     try {
       await deleteCourse(courseId)
       toast.success('Curso eliminado')
-      fetchCourses(page)
+      fetchCourses(page, search)
     } catch (err) {
       toast.error(err.message || 'Error al eliminar')
     } finally {
@@ -110,7 +102,7 @@ const ManageCourses = () => {
   const handleSave = () => {
     setModalOpen(false)
     setEditingCourse(null)
-    fetchCourses(0)
+    fetchCourses(0, search)
   }
 
   return (
@@ -121,7 +113,7 @@ const ManageCourses = () => {
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Cursos</h1>
-            <p className={styles.subtitle}>{search.trim() ? `${filteredCourses.length} resultado${filteredCourses.length !== 1 ? 's' : ''}` : `${courses.length} curso${courses.length !== 1 ? 's' : ''} en total`}</p>
+            <p className={styles.subtitle}>{totalElements} resultado{totalElements !== 1 ? 's' : ''}</p>
           </div>
           <Button onClick={handleCreate}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -169,7 +161,7 @@ const ManageCourses = () => {
                     <span className={styles.colDate}>Creado</span>
                     <span className={styles.colActions}>Acciones</span>
                   </div>
-                  {filteredCourses.map((course) => (
+                  {courses.map((course) => (
                     <div key={course.id} className={styles.tableRow}>
                       <span className={styles.colTitle}>
                         <span className={styles.rowTitle}>{course.title}</span>
@@ -201,9 +193,9 @@ const ManageCourses = () => {
             )}
             {totalPages > 1 && (
               <div className={styles.pagination}>
-                <button className={styles.pageBtn} disabled={page === 0} onClick={() => fetchCourses(page - 1)}>Anterior</button>
+                <button className={styles.pageBtn} disabled={page === 0} onClick={() => fetchCourses(page - 1, search)}>Anterior</button>
                 <span className={styles.pageInfo}>Página {page + 1} de {totalPages}</span>
-                <button className={styles.pageBtn} disabled={page >= totalPages - 1} onClick={() => fetchCourses(page + 1)}>Siguiente</button>
+                <button className={styles.pageBtn} disabled={page >= totalPages - 1} onClick={() => fetchCourses(page + 1, search)}>Siguiente</button>
               </div>
             )}
           </>

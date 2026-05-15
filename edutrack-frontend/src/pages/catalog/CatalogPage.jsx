@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { getCourses } from '@/api/courses'
 import { getCategories } from '@/api/categories'
 import CourseCard from '@/components/course/CourseCard'
@@ -18,7 +18,7 @@ const CatalogPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const loadingRef = useRef(false)
 
-  const fetchCourses = useCallback(async (categoryId = null, pageNum = 0) => {
+  const fetchCourses = useCallback(async (categoryId = null, pageNum = 0, search = '') => {
     if (loadingRef.current) return
     loadingRef.current = true
     setLoading(true)
@@ -26,6 +26,7 @@ const CatalogPage = () => {
     try {
       const params = { page: pageNum, size: 9 }
       if (categoryId) params.categoryId = categoryId
+      if (search.trim()) params.search = search.trim()
       const data = await getCourses(params)
       setCourses(data.content || [])
       setTotalPages(data.totalPages || 0)
@@ -46,22 +47,19 @@ const CatalogPage = () => {
   }, [])
 
   useEffect(() => {
-    if (loadingRef.current) return
-    loadingRef.current = true
-    const params = { page: 0, size: 9 }
-    if (selectedCategory) params.categoryId = selectedCategory
-    getCourses(params).then((data) => {
-      setCourses(data.content || [])
-      setTotalPages(data.totalPages || 0)
-      setTotalElements(data.totalElements || 0)
-      setPage(data.number || 0)
-    }).catch((err) => {
-      setError(err.message || 'Error al cargar cursos')
-    }).finally(() => {
-      setLoading(false)
-      loadingRef.current = false
-    })
-  }, [selectedCategory])
+    fetchCourses(selectedCategory, 0, searchQuery)
+  }, [selectedCategory, fetchCourses])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      fetchCourses(selectedCategory, 0, '')
+      return
+    }
+    const timer = setTimeout(() => {
+      fetchCourses(selectedCategory, 0, searchQuery)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery, selectedCategory, fetchCourses])
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId === selectedCategory ? null : categoryId)
@@ -69,7 +67,7 @@ const CatalogPage = () => {
 
   const handlePageChange = (newPage) => {
     if (newPage < 0 || newPage >= totalPages) return
-    fetchCourses(selectedCategory, newPage)
+    fetchCourses(selectedCategory, newPage, searchQuery)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -81,28 +79,14 @@ const CatalogPage = () => {
     setSearchQuery('')
   }
 
-  const filteredCourses = useMemo(() => {
-    if (!searchQuery.trim()) return courses
-    const query = searchQuery.toLowerCase().trim()
-    return courses.filter(
-      (c) =>
-        c.title.toLowerCase().includes(query) ||
-        c.description.toLowerCase().includes(query) ||
-        c.category?.name.toLowerCase().includes(query)
-    )
-  }, [courses, searchQuery])
-
-  const displayedCourses = searchQuery.trim() ? filteredCourses : courses
-  const totalResults = searchQuery.trim() ? filteredCourses.length : totalElements
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Catálogo de cursos</h1>
           <p className={styles.subtitle}>
-            {totalResults > 0
-              ? `${totalResults} curso${totalResults !== 1 ? 's' : ''} disponible${totalResults !== 1 ? 's' : ''}`
+            {totalElements > 0
+              ? `${totalElements} curso${totalElements !== 1 ? 's' : ''} disponible${totalElements !== 1 ? 's' : ''}`
               : 'Explora nuestro contenido'}
           </p>
         </div>
@@ -125,7 +109,7 @@ const CatalogPage = () => {
                   <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
               </button>
-              <span className={styles.searchCount}>{filteredCourses.length} resultado{filteredCourses.length !== 1 ? 's' : ''}</span>
+              <span className={styles.searchCount}>{totalElements} resultado{totalElements !== 1 ? 's' : ''}</span>
             </>
           )}
         </div>
@@ -159,11 +143,11 @@ const CatalogPage = () => {
       ) : error ? (
         <div className={styles.error}>
           <p>{error}</p>
-          <button className={styles.retryBtn} onClick={() => fetchCourses()}>
+          <button className={styles.retryBtn} onClick={() => fetchCourses(selectedCategory, 0, searchQuery)}>
             Intentar de nuevo
           </button>
         </div>
-      ) : displayedCourses.length === 0 ? (
+      ) : courses.length === 0 ? (
         <div className={styles.empty}>
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -188,12 +172,12 @@ const CatalogPage = () => {
       ) : (
         <>
           <div className={styles.grid}>
-            {displayedCourses.map((course) => (
+            {courses.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
 
-          {!searchQuery.trim() && totalPages > 1 && (
+          {totalPages > 1 && (
             <div className={styles.pagination}>
               <button
                 className={styles.pageBtn}
@@ -211,7 +195,6 @@ const CatalogPage = () => {
                     key={i}
                     className={[styles.pageNum, i === page ? styles.pageNumActive : ''].join(' ')}
                     onClick={() => handlePageChange(i)}
-                    disabled={searchQuery.trim() ? true : undefined}
                   >
                     {i + 1}
                   </button>

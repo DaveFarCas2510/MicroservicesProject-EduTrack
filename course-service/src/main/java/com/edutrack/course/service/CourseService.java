@@ -22,10 +22,20 @@ public class CourseService {
 
     // ── Cursos ───────────────────────────────────────────────────
 
-    public Page<CourseSummaryResponse> getAllCourses(Long categoryId, Pageable pageable) {
-        Page<Course> courses = categoryId != null
-                ? courseRepository.findByCategoryId(categoryId, pageable)
-                : courseRepository.findAll(pageable);
+    public Page<CourseSummaryResponse> getAllCourses(Long categoryId, String search, Pageable pageable) {
+        boolean hasSearch = search != null && !search.isBlank();
+        boolean hasCategory = categoryId != null;
+
+        Page<Course> courses;
+        if (hasSearch && hasCategory) {
+            courses = courseRepository.searchByCategory(categoryId, search, pageable);
+        } else if (hasSearch) {
+            courses = courseRepository.search(search, pageable);
+        } else if (hasCategory) {
+            courses = courseRepository.findByCategoryId(categoryId, pageable);
+        } else {
+            courses = courseRepository.findAll(pageable);
+        }
         return courses.map(this::toCourseSummary);
     }
 
